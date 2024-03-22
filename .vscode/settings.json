@@ -1,0 +1,24 @@
+{
+    "robot.variables": {},
+    "[python]": {
+        "editor.formatOnType": true
+    },
+    "workbench.colorTheme": "Default Light Modern",
+    "robot.lint.ignoreEnvironmentVariables": [
+
+    ],
+    "robot.pythonpath": [
+        "/opt/homebrew/Cellar/python@3.11/3.11.2_1/Frameworks/Python.framework/Versions/3.11/",
+    ],
+    "robot.language-server.python": "/opt/homebrew/Cellar/python@3.11/3.11.2_1/Frameworks/Python.framework/Versions/3.11/",
+    "extensions.ignoreRecommendations": true,
+    "robot.python.executable": "/opt/homebrew/Cellar/python@3.11/3.11.2_1/Frameworks/Python.framework/Versions/3.11/bin/python3",
+    "git.autofetch": true,
+    "files.autoSave": "afterDelay",
+    "git.confirmSync": false,
+    "robotcode.analysis.findUnusedReferences": true,
+    "robotcode.debug.defaultConfiguration": {
+    },
+    "editor.indentSize": 4,
+    "editor.detectIndentation": false
+}
