@@ -1,17 +1,17 @@
 ########## VM Operations ##########
 # Delete and clone a Tart VM given the OS version (i.e. 'sonoma', 'ventura', 'monterey')
 clean-vm () {
-	tart delete $1-edit_1440x900
-	tart clone $1-base_1440x900 $1-edit_1440x900
+	tart delete $1-edit
+	tart clone $1-base $1-edit
 }
 
 # Run a Tart VM given the OS version (i.e. 'sonoma', 'ventura', 'monterey')
 run-vm () {
-	tart run $1-edit_1440x900
+	tart run $1-edit
 }
 
 ssh-vm () {
-	vm=$1-edit_1440x900
+	vm=$1-edit
 	ssh admin@$(tart ip $vm)
 }
 
