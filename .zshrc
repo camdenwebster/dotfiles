@@ -68,3 +68,8 @@ install-config () {
 	cp $1 /Library/Preferences/
 	defaults read /Library/Preferences/$1
 }
+
+alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
+export PYENV_ROOT="$HOME/.pyenv"
+[[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+eval "$(pyenv init -)"

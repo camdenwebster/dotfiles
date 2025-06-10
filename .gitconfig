@@ -1,9 +1,9 @@
 [user]
 	name = Camden Webster
 	email = 59626059+camdenwebster@users.noreply.github.com
-	signingkey = /Users/camdenwebster/.ssh/id_ed25519.pub
+	signingkey = ~/.ssh/id_ed25519.pub
 [core]
-	excludesfile = /Users/camdenwebster/.gitignore_global
+	excludesfile = ~/.gitignore_global
 	editor = nano
 [merge]
       tool = vscode
@@ -17,9 +17,15 @@
 [difftool "vscode"]
 	cmd = code --wait --diff $LOCAL $REMOTE
 [commit]
-	template = /Users/camdenwebster/.stCommitMsg
+	template = ~/.stCommitMsg
 	gpgsign = true
 [init]
 	templatedir = ~/.git-templates
+	defaultBranch = main
 [gpg]
 	format = ssh
+[filter "lfs"]
+	required = true
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
