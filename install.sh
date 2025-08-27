@@ -182,6 +182,32 @@ else
     print_warning "macOS setup script not found at: $macos_setup_script"
 fi
 
+# Step 8: Configure macOS Dock
+print_status "Step 8: Configuring macOS Dock..."
+dock_setup_script="$DOTFILES_DIR/shell/dock-setup.sh"
+
+if [[ -f "$dock_setup_script" ]]; then
+    print_status "Found dock setup script, configuring dock..."
+    print_warning "This will modify your macOS dock by removing and adding applications."
+    
+    # Ask for user confirmation
+    read -p "Do you want to run the dock configuration script? (y/N): " -n 1 -r
+    echo
+    
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        print_status "Running dock setup script..."
+        if bash "$dock_setup_script"; then
+            print_success "Dock configuration completed"
+        else
+            print_warning "Dock configuration script encountered some issues"
+        fi
+    else
+        print_status "Skipping dock configuration"
+    fi
+else
+    print_warning "Dock setup script not found at: $dock_setup_script"
+fi
+
 # Final success message
 print_success "Dotfiles installation completed successfully!"
 print_status "Summary of what was done:"
@@ -190,6 +216,7 @@ echo "  ✅ GNU Stow installed"
 echo "  ✅ Stow packages installed: ${packages[*]}"
 echo "  ✅ Applications installed from Brewfile"
 echo "  ✅ macOS system preferences configured"
+echo "  ✅ macOS dock customized"
 
 if [[ "$conflicts_found" == true ]]; then
     echo "  ⚠️  Some conflicts may need manual resolution"
