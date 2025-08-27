@@ -1,0 +1,16 @@
+Host anka-node-*
+	StrictHostKeyChecking no
+	UserKnownHostsFile /dev/null
+
+Host 192.168.*
+	StrictHostKeyChecking no
+	UserKnownHostsFile /dev/null
+
+Host disable
+	StrictHostKeyChecking no
+	UserKnownHostsFile /dev/null
+
+Host github.com
+	IdentityFile ~/.ssh/id_ed25519
+	AddKeysToAgent yes
+	UseKeychain yes
