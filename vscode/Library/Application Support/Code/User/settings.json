@@ -1,0 +1,32 @@
+{
+  "editor.fontSize": 14,
+  "editor.fontFamily": "SF Mono, Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace",
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.wordWrap": "on",
+  "editor.minimap.enabled": false,
+  "editor.renderWhitespace": "boundary",
+  "editor.rulers": [80, 120],
+  "editor.formatOnSave": true,
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  },
+  "files.autoSave": "afterDelay",
+  "files.autoSaveDelay": 1000,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.DS_Store": true,
+    "**/node_modules": true,
+    "**/.vscode": false
+  },
+  "terminal.integrated.fontSize": 14,
+  "terminal.integrated.fontFamily": "SF Mono, Monaco, 'Cascadia Code', 'Roboto Mono'",
+  "workbench.colorTheme": "Default Dark+",
+  "workbench.iconTheme": "vs-seti",
+  "extensions.autoUpdate": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "python.defaultInterpreterPath": "/usr/bin/python3",
+  "javascript.updateImportsOnFileMove.enabled": "always",
+  "typescript.updateImportsOnFileMove.enabled": "always"
+}

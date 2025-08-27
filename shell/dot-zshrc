@@ -1,0 +1,44 @@
+# Homebrew setup
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# pipx PATH
+export PATH="$PATH:$HOME/.local/bin"
+
+# UTF-8 support for fastlane
+export LANG=en_US.UTF-8
+export LANGUAGE=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+# Set TART_HOME to external drive if available, otherwise use default
+export TART_HOME="${TART_HOME:-/Volumes/samsung/.tart}"
+
+# Aliases
+alias python='python3'
+
+# Initialize pyenv if available
+if command -v pyenv 1>/dev/null 2>&1; then
+  eval "$(pyenv init -)"
+fi
+
+########## VM Operations ##########
+# Update a base VM based on the cloned VM
+update-vm() {
+	tart delete $1-base_1440x900
+	tart clone $1-edit_1440x900 $1-base_1440x900
+}
+
+# Delete and clone a Tart VM given the OS version (i.e. 'sonoma', 'ventura', 'monterey')
+clean-vm () {
+	tart delete $1-edit_1440x900
+	tart clone $1-base_1440x900 $1-edit_1440x900
+}
+
+# Run a Tart VM given the OS version (i.e. 'sonoma', 'ventura', 'monterey')
+run-vm () {
+	tart run --dir=~/dev --dir=~/Downloads $1-edit_1440x900
+}
+
+ssh-vm () {
+	vm=$1-edit_1440x900
+	ssh -i ~/pyautomation admin@$(tart ip $vm)
+}

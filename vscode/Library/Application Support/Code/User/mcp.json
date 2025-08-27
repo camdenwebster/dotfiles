@@ -1,0 +1,44 @@
+{
+	"servers": {
+		"apple-doc-mcp": {
+			"command": "node",
+			"args": ["~/dev/apple-doc-mcp/dist/index.js"]
+		},
+		"atlassian": {
+			"url": "https://mcp.atlassian.com/v1/sse",
+			"type": "http"
+		},
+		"testrail": {
+			"command": "npx",
+			"args": ["@bun913/mcp-testrail@0.13.0"],
+			"env": {
+				"TESTRAIL_URL": "${input:testrail_url}",
+				"TESTRAIL_USERNAME": "${input:testrail_username}",
+				"TESTRAIL_API_KEY": "${input:testrail_api_key}"
+			},
+			"type": "stdio"
+		},
+		"playwright": {
+			"type": "stdio",
+			"command": "npx",
+			"args": ["@playwright/mcp@latest"],
+			"gallery": true
+		}
+	},
+	"inputs": [{
+			"id": "testrail_url",
+			"type": "promptString",
+			"description": "TestRail URL"
+		},
+		{
+			"id": "testrail_username",
+			"type": "promptString",
+			"description": "TestRail Username (email)"
+		},
+		{
+			"id": "testrail_api_key",
+			"type": "promptString",
+			"description": "TestRail API Key"
+		}
+	]
+}

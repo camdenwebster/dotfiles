@@ -91,6 +91,9 @@ defaults write com.apple.finder ShowHardDrivesOnDesktop -bool true
 defaults write com.apple.finder ShowMountedServersOnDesktop -bool true
 defaults write com.apple.finder ShowRemovableMediaOnDesktop -bool true
 
+# Disable click to show desktop
+defaults write com.apple.WindowManager EnableStandardClickToShowDesktop -bool false
+
 # Finder: show hidden files by default
 defaults write com.apple.finder AppleShowAllFiles -bool true
 
