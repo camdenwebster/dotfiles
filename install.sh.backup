@@ -3,26 +3,32 @@
 # Alternative dotfiles installation script using proper stow structure
 # This script demonstrates how to use stow optimally with a properly structured dotfiles repo
 
-set -e  # Exit on any error
+set -e  # Exprint_status "Step 6: Stowing packages..."
+for package in "${packages[@]}"; do
+    print_status "Stowing package: $package"
+    if stow --dotfiles -v -t "$HOME" "$package"; then
+        print_success "Successfully stowed package: $package"
+    else
+        print_error "Failed to stow package: $package"
+        print_error "You may need to resolve conflicts manually"
+    fi
+done
+
+# Step 7: Install from Brewfile if it exists
+print_status "Step 7: Installing from Brewfile..."or
 
 # Parse command line arguments
 WORK_MODE=false
-DRY_RUN=false
 while [[ $# -gt 0 ]]; do
     case $1 in
         --work)
             WORK_MODE=true
             shift
             ;;
-        --dry-run)
-            DRY_RUN=true
-            shift
-            ;;
         -h|--help)
-            echo "Usage: $0 [--work] [--dry-run] [--help]"
-            echo "  --work     Install work-specific configurations (gitconfig and Brewfile)"
-            echo "  --dry-run  Check what would be installed without making changes"
-            echo "  --help     Show this help message"
+            echo "Usage: $0 [--work] [--help]"
+            echo "  --work    Install work-specific configurations (gitconfig and Brewfile)"
+            echo "  --help    Show this help message"
             exit 0
             ;;
         *)
@@ -57,17 +63,9 @@ print_error() {
     echo -e "${RED}[ERROR]${NC} $1"
 }
 
-print_dry_run() {
-    echo -e "${YELLOW}[DRY-RUN]${NC} $1"
-}
-
 # Get the directory where this script is located
 DOTFILES_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 HOME_DIR="$HOME"
-
-if [[ "$DRY_RUN" == true ]]; then
-    print_dry_run "DRY RUN MODE - No changes will be made"
-fi
 
 if [[ "$WORK_MODE" == true ]]; then
     print_status "Starting dotfiles installation with proper stow structure (WORK MODE)..."
@@ -86,23 +84,19 @@ print_status "Step 1: Installing Homebrew..."
 if command -v brew &> /dev/null; then
     print_success "Homebrew is already installed"
 else
-    if [[ "$DRY_RUN" == true ]]; then
-        print_dry_run "Would install Homebrew"
+    print_status "Installing Homebrew..."
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+    
+    # Add Homebrew to PATH for Apple Silicon Macs
+    if [[ $(uname -m) == "arm64" ]]; then
+        echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile"
+        eval "$(/opt/homebrew/bin/brew shellenv)"
     else
-        print_status "Installing Homebrew..."
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-        
-        # Add Homebrew to PATH for Apple Silicon Macs
-        if [[ $(uname -m) == "arm64" ]]; then
-            echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> "$HOME/.zprofile"
-            eval "$(/opt/homebrew/bin/brew shellenv)"
-        else
-            echo 'eval "$(/usr/local/bin/brew shellenv)"' >> "$HOME/.zprofile"
-            eval "$(/usr/local/bin/brew shellenv)"
-        fi
-        
-        print_success "Homebrew installed successfully"
+        echo 'eval "$(/usr/local/bin/brew shellenv)"' >> "$HOME/.zprofile"
+        eval "$(/usr/local/bin/brew shellenv)"
     fi
+    
+    print_success "Homebrew installed successfully"
 fi
 
 # Step 2: Install stow
@@ -110,12 +104,8 @@ print_status "Step 2: Installing GNU Stow..."
 if command -v stow &> /dev/null; then
     print_success "GNU Stow is already installed"
 else
-    if [[ "$DRY_RUN" == true ]]; then
-        print_dry_run "Would install GNU Stow"
-    else
-        brew install stow
-        print_success "GNU Stow installed successfully"
-    fi
+    brew install stow
+    print_success "GNU Stow installed successfully"
 fi
 
 # Step 3: Check for proper stow structure
@@ -165,11 +155,7 @@ for package in "${packages[@]}"; do
         print_warning "Conflicts detected for package: $package"
         
         if [[ "$conflicts_found" == false ]]; then
-            if [[ "$DRY_RUN" == true ]]; then
-                print_dry_run "Would create backup directory: $backup_dir"
-            else
-                mkdir -p "$backup_dir"
-            fi
+            mkdir -p "$backup_dir"
             conflicts_found=true
         fi
         
@@ -185,16 +171,12 @@ print_status "Step 5: Setting up configuration files for $CONFIG_SUFFIX mode..."
 # Handle gitconfig
 if [[ -f "$DOTFILES_DIR/shell/dot-gitconfig-$CONFIG_SUFFIX" ]]; then
     print_status "Using $CONFIG_SUFFIX gitconfig..."
-    if [[ "$DRY_RUN" == true ]]; then
-        print_dry_run "Would symlink dot-gitconfig-$CONFIG_SUFFIX to dot-gitconfig"
-    else
-        # Remove existing gitconfig symlink if it exists
-        if [[ -L "$DOTFILES_DIR/shell/dot-gitconfig" ]]; then
-            rm "$DOTFILES_DIR/shell/dot-gitconfig"
-        fi
-        # Create symlink to the appropriate gitconfig
-        ln -sf "dot-gitconfig-$CONFIG_SUFFIX" "$DOTFILES_DIR/shell/dot-gitconfig"
+    # Remove existing gitconfig symlink if it exists
+    if [[ -L "$DOTFILES_DIR/shell/dot-gitconfig" ]]; then
+        rm "$DOTFILES_DIR/shell/dot-gitconfig"
     fi
+    # Create symlink to the appropriate gitconfig
+    ln -sf "dot-gitconfig-$CONFIG_SUFFIX" "$DOTFILES_DIR/shell/dot-gitconfig"
     print_success "Configured gitconfig for $CONFIG_SUFFIX mode"
 elif [[ -f "$DOTFILES_DIR/shell/dot-gitconfig" ]]; then
     print_status "Using default gitconfig (no $CONFIG_SUFFIX-specific config found)"
@@ -205,16 +187,12 @@ fi
 # Handle Brewfile
 if [[ -f "$DOTFILES_DIR/homebrew/dot-Brewfile-$CONFIG_SUFFIX" ]]; then
     print_status "Using $CONFIG_SUFFIX Brewfile..."
-    if [[ "$DRY_RUN" == true ]]; then
-        print_dry_run "Would symlink dot-Brewfile-$CONFIG_SUFFIX to dot-Brewfile"
-    else
-        # Remove existing Brewfile symlink if it exists
-        if [[ -L "$DOTFILES_DIR/homebrew/dot-Brewfile" ]]; then
-            rm "$DOTFILES_DIR/homebrew/dot-Brewfile"
-        fi
-        # Create symlink to the appropriate Brewfile
-        ln -sf "dot-Brewfile-$CONFIG_SUFFIX" "$DOTFILES_DIR/homebrew/dot-Brewfile"
+    # Remove existing Brewfile symlink if it exists
+    if [[ -L "$DOTFILES_DIR/homebrew/dot-Brewfile" ]]; then
+        rm "$DOTFILES_DIR/homebrew/dot-Brewfile"
     fi
+    # Create symlink to the appropriate Brewfile
+    ln -sf "dot-Brewfile-$CONFIG_SUFFIX" "$DOTFILES_DIR/homebrew/dot-Brewfile"
     print_success "Configured Brewfile for $CONFIG_SUFFIX mode"
 elif [[ -f "$DOTFILES_DIR/homebrew/dot-Brewfile" ]]; then
     print_status "Using default Brewfile (no $CONFIG_SUFFIX-specific config found)"
@@ -226,17 +204,11 @@ fi
 print_status "Step 6: Stowing packages..."
 for package in "${packages[@]}"; do
     print_status "Stowing package: $package"
-    if [[ "$DRY_RUN" == true ]]; then
-        print_dry_run "Would stow package: $package"
-        # Show what would be stowed
-        stow --dotfiles -n -v -t "$HOME" "$package" 2>&1 | head -10 || true
+    if stow --dotfiles -v -t "$HOME" "$package"; then
+        print_success "Successfully stowed package: $package"
     else
-        if stow --dotfiles -v -t "$HOME" "$package"; then
-            print_success "Successfully stowed package: $package"
-        else
-            print_error "Failed to stow package: $package"
-            print_error "You may need to resolve conflicts manually"
-        fi
+        print_error "Failed to stow package: $package"
+        print_error "You may need to resolve conflicts manually"
     fi
 done
 
@@ -248,22 +220,12 @@ brew_success=true
 if [[ -f "$DOTFILES_DIR/homebrew/dot-Brewfile-shared" ]]; then
     print_status "Installing shared packages from Brewfile-shared..."
     cd "$DOTFILES_DIR"
-    if [[ "$DRY_RUN" == true ]]; then
-        print_dry_run "Checking shared Brewfile packages..."
-        if brew bundle check --file="$DOTFILES_DIR/homebrew/dot-Brewfile-shared"; then
-            print_success "All shared packages are already installed"
-        else
-            print_warning "Some shared packages are missing and would be installed"
-            brew bundle list --file="$DOTFILES_DIR/homebrew/dot-Brewfile-shared" | head -10
-        fi
+    if brew bundle install --file="$DOTFILES_DIR/homebrew/dot-Brewfile-shared"; then
+        print_success "Shared Brewfile packages installed successfully"
     else
-        if brew bundle install --file="$DOTFILES_DIR/homebrew/dot-Brewfile-shared"; then
-            print_success "Shared Brewfile packages installed successfully"
-        else
-            print_error "Some packages from shared Brewfile failed to install"
-            print_warning "Continuing with remaining setup tasks..."
-            brew_success=false
-        fi
+        print_error "Some packages from shared Brewfile failed to install"
+        print_warning "Continuing with remaining setup tasks..."
+        brew_success=false
     fi
 fi
 
@@ -271,21 +233,12 @@ fi
 if [[ -f "$HOME/.Brewfile" ]]; then
     print_status "Found Brewfile in home directory, installing packages..."
     cd "$HOME"
-    if [[ "$DRY_RUN" == true ]]; then
-        print_dry_run "Checking home Brewfile packages..."
-        if brew bundle check --file="$HOME/.Brewfile"; then
-            print_success "All home packages are already installed"
-        else
-            print_warning "Some home packages are missing and would be installed"
-        fi
+    if brew bundle install --file="$HOME/.Brewfile"; then
+        print_success "Home Brewfile packages installed successfully"
     else
-        if brew bundle install --file="$HOME/.Brewfile"; then
-            print_success "Home Brewfile packages installed successfully"
-        else
-            print_error "Some packages from home Brewfile failed to install"
-            print_warning "Continuing with remaining setup tasks..."
-            brew_success=false
-        fi
+        print_error "Some packages from home Brewfile failed to install"
+        print_warning "Continuing with remaining setup tasks..."
+        brew_success=false
     fi
 else
     print_warning "No .Brewfile found in home directory"
@@ -296,22 +249,12 @@ else
             print_status "Found Brewfile in package: $package (mode: $CONFIG_SUFFIX)"
             cd "$DOTFILES_DIR"
             brewfile_found=true
-            if [[ "$DRY_RUN" == true ]]; then
-                print_dry_run "Checking $CONFIG_SUFFIX Brewfile packages..."
-                if brew bundle check --file="$package/dot-Brewfile"; then
-                    print_success "All $CONFIG_SUFFIX packages are already installed"
-                else
-                    print_warning "Some $CONFIG_SUFFIX packages are missing and would be installed"
-                    brew bundle list --file="$package/dot-Brewfile" | head -10
-                fi
+            if brew bundle install --file="$package/dot-Brewfile"; then
+                print_success "Brewfile from $package installed successfully"
             else
-                if brew bundle install --file="$package/dot-Brewfile"; then
-                    print_success "Brewfile from $package installed successfully"
-                else
-                    print_error "Some packages from $package/dot-Brewfile failed to install"
-                    print_warning "Continuing with remaining setup tasks..."
-                    brew_success=false
-                fi
+                print_error "Some packages from $package/dot-Brewfile failed to install"
+                print_warning "Continuing with remaining setup tasks..."
+                brew_success=false
             fi
             break
         fi
@@ -330,15 +273,19 @@ if [[ -f "$macos_setup_script" ]]; then
     print_status "Found macOS setup script, running configuration..."
     print_warning "This will modify various macOS system preferences."
     
-    if [[ "$DRY_RUN" == true ]]; then
-        print_dry_run "Would run macOS configuration script: $macos_setup_script"
-    else
+    # Ask for user confirmation
+    read -p "Do you want to run the macOS configuration script? (y/N): " -n 1 -r
+    echo
+    
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
         print_status "Running macOS setup script..."
         if bash "$macos_setup_script"; then
             print_success "macOS configuration completed"
         else
             print_warning "macOS configuration script encountered some issues"
         fi
+    else
+        print_status "Skipping macOS configuration"
     fi
 else
     print_warning "macOS setup script not found at: $macos_setup_script"
@@ -352,29 +299,27 @@ if [[ -f "$dock_setup_script" ]]; then
     print_status "Found dock setup script, configuring dock..."
     print_warning "This will modify your macOS dock by removing and adding applications."
     
-    if [[ "$DRY_RUN" == true ]]; then
-        print_dry_run "Would run dock configuration script: $dock_setup_script"
-    else
+    # Ask for user confirmation
+    read -p "Do you want to run the dock configuration script? (y/N): " -n 1 -r
+    echo
+    
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
         print_status "Running dock setup script..."
         if bash "$dock_setup_script"; then
             print_success "Dock configuration completed"
         else
             print_warning "Dock configuration script encountered some issues"
         fi
+    else
+        print_status "Skipping dock configuration"
     fi
 else
     print_warning "Dock setup script not found at: $dock_setup_script"
 fi
 
 # Final success message
-if [[ "$DRY_RUN" == true ]]; then
-    print_success "Dry run completed - no changes were made!"
-    print_status "This is what would have been done (mode: $CONFIG_SUFFIX):"
-else
-    print_success "Dotfiles installation completed!"
-    print_status "Summary of what was done (mode: $CONFIG_SUFFIX):"
-fi
-
+print_success "Dotfiles installation completed!"
+print_status "Summary of what was done (mode: $CONFIG_SUFFIX):"
 echo "  ✅ Homebrew installed/verified"
 echo "  ✅ GNU Stow installed"
 echo "  ✅ Configuration files set for $CONFIG_SUFFIX mode"
@@ -386,16 +331,12 @@ else
     echo "  ⚠️  Some Brewfile packages failed to install (check output above)"
 fi
 
-if [[ "$DRY_RUN" == false ]]; then
-    echo "  ✅ macOS system preferences configured"
-    echo "  ✅ macOS dock customized"
-fi
+echo "  ✅ macOS system preferences configured"
+echo "  ✅ macOS dock customized"
 
 if [[ "$conflicts_found" == true ]]; then
     echo "  ⚠️  Some conflicts may need manual resolution"
-    if [[ "$DRY_RUN" == false ]]; then
-        echo "  📁 Check backup directory: $backup_dir"
-    fi
+    echo "  📁 Check backup directory: $backup_dir"
 fi
 
 if [[ "$brew_success" == false ]]; then
@@ -406,8 +347,4 @@ if [[ "$brew_success" == false ]]; then
     echo "  • Check if the failing packages are available"
 fi
 
-if [[ "$DRY_RUN" == false ]]; then
-    print_status "Restart your terminal or run 'source ~/.zshrc' to apply changes."
-else
-    print_status "To actually run the installation, run this script without --dry-run"
-fi
+print_status "Restart your terminal or run 'source ~/.zshrc' to apply changes."

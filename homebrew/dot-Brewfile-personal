@@ -1,0 +1,9 @@
+# Personal apps and tools
+cask "cap"
+cask "chatgpt"
+cask "claude"
+cask "conductor"
+cask "zoom"
+
+# Personal Mac App Store apps
+mas "Endel", id: 1346247457

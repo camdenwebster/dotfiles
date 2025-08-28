@@ -101,6 +101,8 @@ declare -A apps_to_add=(
     ["Visual Studio Code"]="/Applications/Visual Studio Code.app"
     ["Xcode"]="/Applications/Xcode.app"
     ["Slack"]="/Applications/Slack.app"
+    ["iTerm"]="/Applications/iTerm.app"
+    ["GitHub Desktop"]="/Applications/GitHub Desktop.app"
 )
 
 declare -A app_positions=(
@@ -108,10 +110,12 @@ declare -A app_positions=(
     ["Visual Studio Code"]=5
     ["Xcode"]=6
     ["Slack"]=7
+    ["iTerm"]=8
+    ["GitHub Desktop"]=9
 )
 
 # Add each application at the specified position
-for app_name in "Obsidian" "Visual Studio Code" "Xcode" "Slack"; do
+for app_name in "Obsidian" "Visual Studio Code" "Xcode" "Slack" "iTerm" "GitHub Desktop"; do
     app_path="${apps_to_add[$app_name]}"
     position="${app_positions[$app_name]}"
     
@@ -144,4 +148,6 @@ echo "  📱 Added Obsidian at position 4"
 echo "  💻 Added Visual Studio Code at position 5"
 echo "  🔨 Added Xcode at position 6"
 echo "  💬 Added Slack at position 7"
+echo "  🖥️ Added iTerm at position 8"
+echo "  🐙 Added GitHub Desktop at position 9"
 print_status "The Dock will restart automatically to show the changes."

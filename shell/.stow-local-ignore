@@ -1,3 +1,7 @@
 # Ignore shell scripts that should not be symlinked
 dock-setup\.sh
 macos-setup\.sh
+
+# Ignore mode-specific config files (symlinks will be created instead)
+dot-gitconfig-personal
+dot-gitconfig-work

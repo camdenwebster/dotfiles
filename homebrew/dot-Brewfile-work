@@ -1,0 +1,15 @@
+# Work-specific applications
+cask "anka-virtualization"
+cask "github-copilot-for-xcode"
+cask "microsoft-office"
+
+# Work Mac App Store apps
+mas "Apple Configurator", id: 1037126344
+
+# Work VSCode extensions
+vscode "d-biehl.robotcode"
+vscode "github.copilot"
+vscode "github.copilot-chat"
+vscode "janjoerke.jenkins-pipeline-linter-connector"
+vscode "nicolasvuillamy.vscode-groovy-lint"
+vscode "secanis.jenkinsfile-support"
