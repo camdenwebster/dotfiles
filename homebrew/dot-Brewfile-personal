@@ -2,6 +2,7 @@
 cask "cap"
 cask "chatgpt"
 cask "claude"
+cask "claude-code"
 cask "conductor"
 cask "zoom"
 

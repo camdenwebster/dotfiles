@@ -240,6 +240,29 @@ for package in "${packages[@]}"; do
     fi
 done
 
+# Step 6.5: Configure environment variables based on mode
+print_status "Step 6.5: Configuring environment variables for $CONFIG_SUFFIX mode..."
+
+if [[ "$WORK_MODE" == false ]]; then
+    # Personal mode - add DISABLE_AUTOUPDATER=1 for Claude Code
+    if [[ "$DRY_RUN" == true ]]; then
+        print_dry_run "Would add DISABLE_AUTOUPDATER=1 to .zshrc (personal mode only)"
+    else
+        # Check if the variable is already set in .zshrc
+        if [[ -f "$HOME/.zshrc" ]] && grep -q "DISABLE_AUTOUPDATER" "$HOME/.zshrc"; then
+            print_status "DISABLE_AUTOUPDATER already configured in .zshrc"
+        else
+            print_status "Adding DISABLE_AUTOUPDATER=1 to .zshrc (personal mode)"
+            echo "" >> "$HOME/.zshrc"
+            echo "# Personal mode - disable auto-updater" >> "$HOME/.zshrc"
+            echo "export DISABLE_AUTOUPDATER=1" >> "$HOME/.zshrc"
+            print_success "Added DISABLE_AUTOUPDATER=1 to .zshrc"
+        fi
+    fi
+else
+    print_status "Work mode - skipping DISABLE_AUTOUPDATER configuration"
+fi
+
 # Step 7: Install from Brewfile if it exists
 print_status "Step 7: Installing from Brewfile..."
 brew_success=true
@@ -379,6 +402,11 @@ echo "  ✅ Homebrew installed/verified"
 echo "  ✅ GNU Stow installed"
 echo "  ✅ Configuration files set for $CONFIG_SUFFIX mode"
 echo "  ✅ Stow packages installed: ${packages[*]}"
+if [[ "$WORK_MODE" == false ]]; then
+    echo "  ✅ Environment variables configured (DISABLE_AUTOUPDATER)"
+else
+    echo "  ✅ Environment variables configured (work mode - no auto-updater disable)"
+fi
 
 if [[ "$brew_success" == true ]]; then
     echo "  ✅ Applications installed from Brewfile(s)"
